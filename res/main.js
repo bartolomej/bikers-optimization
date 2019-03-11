@@ -36,7 +36,7 @@ async function computeRace(raceId, algorithm, plotChart) {
 
 async function onFinish(raceId, score, race) {
     let parsedData = utils.stringifyData(raceId, race);
-    let filename =  'race' + raceId + '_' + score + '_' + new Date().getUTCMilliseconds();
+    let filename =  'race_' + raceId + '_' + score + '_' + new Date().getUTCMilliseconds();
     await utils.saveData(parsedData, filename);
 }
 
