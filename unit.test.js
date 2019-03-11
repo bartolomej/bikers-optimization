@@ -44,9 +44,13 @@ describe('Race class testing', function () {
         let arrayMix = race.randomBikersMix([1,2,3], [3]);
         let falseArrayMix = race.randomBikersMix([1,2,3], [2,3]);
         let nonArrayMix = race.randomBikersMix([1,2,3], []);
-        let withoutMergeDuplication = Race.mergeWithoutDuplication([1,2,3,4,5], [5,6]);
+        let withMergeDuplication = Race.mergeWithoutDuplication([4,5,1,2,6,3], [5,6,1]);
+        let withoutMergeDuplication = Race.mergeWithoutDuplication([1,5,2,4,6,3], [8,2,6,7]);
         should.equal(arraySum, 8);
-        should.equal(withoutMergeDuplication[0], 6);
+        should.equal(withMergeDuplication.length, 0);
+        should.equal(withoutMergeDuplication.length, 2);
+        should.equal(withoutMergeDuplication[0], 8);
+        should.equal(withoutMergeDuplication[1], 7);
         should.not.equal(arrayMix, [1,2,3]);
         should.equal(falseArrayMix instanceof Error, true);
         should.equal(nonArrayMix.length, 3);

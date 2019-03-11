@@ -85,13 +85,6 @@ class Race {
     return oldBikers;
   }
 
-  static mergeWithoutDuplication(target, input) {
-    let finalArray = [];
-    for (let i = 0; i < input.length; i++)
-      if (!target.includes(input[i])) finalArray.push(input[i]);
-    return finalArray;
-  }
-
   getBikersScore(race, bikers) {
     let scores = [];
     for (let i = 0; i < bikers.length; i++) {
@@ -101,6 +94,13 @@ class Race {
         }
       }
     return scores;
+  }
+
+  static mergeWithoutDuplication(target, input) {
+    let finalArray = [];
+    for (let i = 0; i < input.length; i++)
+      if (!target.includes(input[i])) finalArray.push(input[i]);
+    return finalArray;
   }
 
   static randomNumbers(number, max) {
