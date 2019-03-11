@@ -38,7 +38,7 @@ class Race {
   }
 
   randomSwitching() {
-    let race = {
+    const race = {
       bikers: [Race.randomNumbers(this.nVirtualBikers, this.nBikers)],
       scoreSum: 0,
       scoreList: [],
@@ -47,8 +47,9 @@ class Race {
     for (let i = 0; i < this.races.length; i++) {
       let scores = this.getBikersScore(this.races[i], race.bikers[i]);
       let nSwitches = Race.random(this.nSwitches);
-      let newBikers = Race.randomNumbers(nSwitches, this.nBikers);
-      race.bikers.push(this.randomBikersMix(this.races[i], newBikers));
+      let oldBikers = race.bikers[i].slice();
+      let newBikers = Race.randomNumbers(nSwitches, this.nBikers, race.bikers[i]);
+      race.bikers.push(this.randomBikersMix(oldBikers, newBikers));
       race.scoreSum += Race.getArraySum(scores);
       race.scoreList.push(scores);
       race.scoreSumList.push(race.scoreSum);
@@ -57,30 +58,30 @@ class Race {
     return race;
   }
 
-  computationalSwitching() {
+  btureForce() {
     let race = {
       bikers: [Race.randomNumbers(this.nVirtualBikers, this.nBikers)],
       scoreSum: 0,
       scoreList: [],
       scoreSumList: []
     }
-    // TODO: compute the most significant switching for every race
     // TODO: fire multiple instances of algorithm
-    // TODO: log already computed possibilities
+    // TODO: log already computed possibilities -> dynamic programming
   }
 
   randomBikersMix(oldBikers, newBikers) {
     if (newBikers.length === 0) return oldBikers;
     if (newBikers.length > this.nSwitches)
       return new Error('More switched bikers than allowed');
+    // switch some old biker with new one
+    oldBikers.splice(1, newBikers.length); // TODO choose better algorithm
     newBikers = Race.mergeWithoutDuplication(oldBikers, newBikers);
-    let randoms = Race.randomNumbers(newBikers.length - 1, oldBikers.length - 1);
-    let j = 0;
     for (let i = 0; i < oldBikers.length; i++) {
-      if (randoms.includes(i)) {
-        oldBikers[i] = newBikers[j];
-        j++;
-      }
+      let random1 = Race.random(newBikers.length-1);
+      let random2 = Race.random(newBikers.length-1);
+      let eleSwitch = newBikers[random1];
+      newBikers[random1] = newBikers[random2];
+      newBikers[random2] = eleSwitch;
     }
     return oldBikers;
   }
@@ -97,18 +98,18 @@ class Race {
   }
 
   static mergeWithoutDuplication(target, input) {
-    let finalArray = [];
+    let finalArray = target;
     for (let i = 0; i < input.length; i++)
       if (!target.includes(input[i])) finalArray.push(input[i]);
     return finalArray;
   }
 
-  static randomNumbers(number, max) {
+  static randomNumbers(number, max, except = []) {
     let numbers = [];
     if (number >= max) return new Error("Cant generate distinct numbers");
     for (let i = 0; i < number; i ++) {
       let randNumber = Math.floor(Math.random() * max);
-        while (numbers.includes(randNumber))
+        while (numbers.includes(randNumber) || except.includes(randNumber))
           randNumber = Math.floor(Math.random() * max);
         numbers.push(randNumber);
     }

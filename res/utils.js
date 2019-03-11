@@ -38,7 +38,7 @@ function stringifyData(raceId, arrayOfRaces) {
 
 function saveJsonData(object, filename) {
   return new Promise(resolve => {
-      fs.writeFile(filename, JSON.stringify(object, null, 2), 'utf8',
+      fs.writeFile('../inputs/' +filename, JSON.stringify(object, null, 2), 'utf8',
           (err, success) => {
             if (err) return resolve(err);
             else return resolve(success);
@@ -48,7 +48,7 @@ function saveJsonData(object, filename) {
 
 function saveData(object, filename) {
     return new Promise(resolve => {
-        fs.writeFile(filename + '.txt', object, 'utf8',
+        fs.writeFile('../results/' + filename + '.txt', object, 'utf8',
             (err, success) => {
                 if (err) return resolve(err);
                 else return resolve(success);
@@ -58,7 +58,7 @@ function saveData(object, filename) {
 
 function getFileData(filename) {
   return new Promise((resolve => {
-    const fileStream = fs.createReadStream(filename);
+    const fileStream = fs.createReadStream('../inputs/' +filename);
     let fileData = '';
     fileStream.on('data', data => fileData += data);
     fileStream.on('error', err => err);
@@ -68,10 +68,10 @@ function getFileData(filename) {
 
 function getJsonFileData(filename) {
     return new Promise((resolve => {
-        const fileStream = fs.createReadStream(filename);
+        const fileStream = fs.createReadStream('../inputs/' + filename + '.json');
         let fileData = '';
         fileStream.on('data', data => fileData += data);
-        fileStream.on('error', err => err);
+        fileStream.on('error', err => console.error(err));
         fileStream.on('end', () => resolve(JSON.parse(fileData)))
     }));
 }

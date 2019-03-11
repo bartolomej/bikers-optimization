@@ -1,13 +1,13 @@
 const should = require('chai').should();
 const expect = require('chai').expect;
 const assert = require('chai').assert;
-const utils = require('./utils');
-const Race = require('./Race').Race;
-const main = require('./main');
+const utils = require('./res/utils');
+const Race = require('./res/Race').Race;
+const main = require('./res/main');
 
 describe('Parsing testing', function () {
     it('should read file', async function () {
-        let file = await utils.getJsonFileData('test.json');
+        let file = await utils.getJsonFileData('test');
         should.exist(file);
     });
     it('should parse file', async function () {
@@ -36,28 +36,28 @@ describe('Race class testing', function () {
         should.exist(n1);
         should.exist(n2);
         should.equal(n3 instanceof Error, true);
-        should.equal(n4, []);
+        should.equal(n4.length, 0);
     });
     it('should test class functions', function () {
-        let race = new Race(1, 3, 2, 2, 1, [100, 80, 60], [[3,1,2],[1,3,2]]);
+        let race = new Race(1, 3, 2, 2, 2, [100, 80, 60], [[3,1,2],[1,3,2]]);
         let arraySum = Race.getArraySum([1,3,4]);
-        let arrayMix = race.randomBikersMix([1,2,3], [3]);
-        let falseArrayMix = race.randomBikersMix([1,2,3], [2,3]);
+        let arrayMix = race.randomBikersMix([1,2,3], [4]); // must be random
+        let falseArrayMix = race.randomBikersMix([1,2,3], [1,3,4]);
         let nonArrayMix = race.randomBikersMix([1,2,3], []);
         let withMergeDuplication = Race.mergeWithoutDuplication([4,5,1,2,6,3], [5,6,1]);
         let withoutMergeDuplication = Race.mergeWithoutDuplication([1,5,2,4,6,3], [8,2,6,7]);
         should.equal(arraySum, 8);
-        should.equal(withMergeDuplication.length, 0);
-        should.equal(withoutMergeDuplication.length, 2);
-        should.equal(withoutMergeDuplication[0], 8);
-        should.equal(withoutMergeDuplication[1], 7);
+        should.equal(arrayMix.length, 4);
+        should.equal(nonArrayMix.length, 3);
+        should.equal(withMergeDuplication.length, 6);
+        should.equal(withoutMergeDuplication.length, 8);
         should.not.equal(arrayMix, [1,2,3]);
         should.equal(falseArrayMix instanceof Error, true);
         should.equal(nonArrayMix.length, 3);
     });
     it('should calculate bikers scores', function () {
         let races = [[5,3,4,2,1], [3,4,5,1,2], [1,2,5,3,4]];
-        let race = new Race(1, 5, 3, 3, 1, [100, 80, 60, 40, 30], races);
+        let race = new Race(1, 5, 3, 3, 2, [100, 80, 60, 40, 30], races);
         let noSwitchResult = race.noSwitching();
         let randomSwitchResult = race.randomSwitching();
         should.exist(noSwitchResult);

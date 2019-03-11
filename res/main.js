@@ -5,14 +5,19 @@ const Race = require('./Race').Race;
 (async function init() {
     let raceId = Number.parseInt(process.argv[2]);
     let algorithm = process.argv[3];
+    let repeat = Number.parseInt(process.argv[4]);
+    if (process.argv[4] === undefined) repeat = 1;
     if (algorithm === 'no-switching' || algorithm === 'random-switching'
         && raceId > 0 && raceId < 29)  {
-        await computeRace(raceId, algorithm)
+        for (let i = 0; i < repeat; i++) {
+            if (repeat > 1) await computeRace(raceId, algorithm, false);
+            else await computeRace(raceId, algorithm);
+        }
     }
 })();
 
-async function computeRace(raceId, algorithm) {
-    let data = await utils.getJsonFileData('test.json');
+async function computeRace(raceId, algorithm, plotChart) {
+    let data = await utils.getJsonFileData('test');
     let r = data[raceId-1];
     let race = new Race(raceId, r.stats.n, r.stats.k, r.stats.d, r.stats.m, r.points, r.orderedRaces);
     let attempt;
@@ -24,9 +29,9 @@ async function computeRace(raceId, algorithm) {
             attempt = race.randomSwitching();
             break;
     }
-    plot(getNumbersArray(attempt.scoreSumList.length), attempt.scoreSumList);
+    if (plotChart) plot(getNumbersArray(attempt.scoreSumList.length), attempt.scoreSumList);
+    if (plotChart) console.log(race);
     await onFinish(race.id, attempt.scoreSum, attempt.bikers);
-    console.log(race);
 }
 
 async function onFinish(raceId, score, race) {
