@@ -58,17 +58,6 @@ class Race {
     return race;
   }
 
-  bruteForce() {
-    let race = {
-      bikers: [Race.randomNumbers(this.nVirtualBikers, this.nBikers)],
-      scoreSum: 0,
-      scoreList: [],
-      scoreSumList: []
-    }
-    // TODO: fire multiple instances of algorithm
-    // TODO: log already computed possibilities -> dynamic programming
-  }
-
   randomBikersMix(oldBikers, newBikers) {
     if (newBikers.length === 0) return oldBikers;
     if (newBikers.length > this.nSwitches)
