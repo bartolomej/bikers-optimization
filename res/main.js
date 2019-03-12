@@ -9,29 +9,28 @@ const Race = require('./Race').Race;
     if (process.argv[4] === undefined) repeat = 1;
     if (algorithm === 'no-switching' || algorithm === 'random-switching'
         && raceId > 0 && raceId < 29)  {
-        for (let i = 0; i < repeat; i++) {
-            if (repeat > 1) await computeRace(raceId, algorithm, false);
-            else await computeRace(raceId, algorithm);
-        }
+        await computeRace(raceId, algorithm, repeat)
     }
 })();
 
-async function computeRace(raceId, algorithm, plotChart) {
+async function computeRace(raceId, algorithm, repeat) {
     let data = await utils.getJsonFileData('test');
     let r = data[raceId-1];
     let race = new Race(raceId, r.stats.n, r.stats.k, r.stats.d, r.stats.m, r.points, r.orderedRaces);
-    let attempt;
-    switch (algorithm) {
-        case 'no-switching':
-            attempt = race.noSwitching();
-            break;
-        case 'random-switching':
-            attempt = race.randomSwitching();
-            break;
-    }
-    if (plotChart) plot(getNumbersArray(attempt.scoreSumList.length), attempt.scoreSumList);
-    if (plotChart) console.log(race);
-    await onFinish(race.id, attempt.scoreSum, attempt.bikers);
+    let attempts = [];
+    for (let i = 0; i < repeat; i++)
+        attempts.push(race.randomSwitching());
+    let bestAttempt = {scoreSum: 0};
+    for (let i = 0; i < repeat; i++)
+        if (attempts[i].scoreSum > bestAttempt.scoreSum)  bestAttempt = attempts[i];
+    plot(getNumbersArray(bestAttempt.scoreSumList.length), bestAttempt.scoreSumList);
+    await onFinish(race.id, bestAttempt.scoreSum, bestAttempt.bikers);
+    log(race, attempts, bestAttempt);
+}
+
+function log(race, attempts, bestAttempt) {
+    console.log('best result: ', bestAttempt);
+    console.log('\n');
 }
 
 async function onFinish(raceId, score, race) {

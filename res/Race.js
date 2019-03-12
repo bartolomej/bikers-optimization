@@ -58,7 +58,7 @@ class Race {
     return race;
   }
 
-  btureForce() {
+  bruteForce() {
     let race = {
       bikers: [Race.randomNumbers(this.nVirtualBikers, this.nBikers)],
       scoreSum: 0,
@@ -73,8 +73,7 @@ class Race {
     if (newBikers.length === 0) return oldBikers;
     if (newBikers.length > this.nSwitches)
       return new Error('More switched bikers than allowed');
-    // switch some old biker with new one
-    oldBikers.splice(1, newBikers.length); // TODO choose better algorithm
+    oldBikers.splice(0, newBikers.length);
     newBikers = Race.mergeWithoutDuplication(oldBikers, newBikers);
     for (let i = 0; i < oldBikers.length; i++) {
       let random1 = Race.random(newBikers.length-1);
