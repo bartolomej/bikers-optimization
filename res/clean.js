@@ -3,7 +3,11 @@ const path = require('path');
 
 const directory = '../results/';
 
-(function clean() {
+(function() {
+    clean();
+})();
+
+function clean() {
     fs.readdir(directory, (err, files) => {
         if (err) throw err;
         let bestResults = [];
@@ -14,6 +18,7 @@ const directory = '../results/';
             if (bestResults[raceId-1] === undefined ||
                 bestResults[raceId-1] < score) bestResults[raceId-1] = score;
         }
+        console.log('best results: ', bestResults);
         for (const file of files) {
             let search = file.split("_");
             let score = Number.parseInt(search[2]);
@@ -24,4 +29,8 @@ const directory = '../results/';
             }
         }
     });
-})();
+}
+
+module.exports = {
+    clean: clean
+}

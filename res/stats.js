@@ -1,0 +1,1 @@
+// TODO calculate statistical data about results distribution and plot a graph

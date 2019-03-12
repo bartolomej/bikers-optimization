@@ -4,6 +4,7 @@ const assert = require('chai').assert;
 const utils = require('./res/utils');
 const Race = require('./res/Race').Race;
 const main = require('./res/main');
+const clean = require('./res/clean');
 
 describe('Parsing testing', function () {
     it('should read file', async function () {
@@ -24,6 +25,9 @@ describe('Parsing testing', function () {
         let races = [[1,2,3], [3,1,2], [2,1,3]];
         let output = utils.stringifyData(1, races);
         utils.saveData(output, 'test.txt');
+    });
+    it('should correctly determine files with best results', function () {
+        clean.clean()
     });
 });
 
