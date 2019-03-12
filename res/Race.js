@@ -20,23 +20,6 @@ class Race {
     this.computed = [];
   }
 
-  noSwitching() {
-    let race = {
-      bikers: Race.randomNumbers(this.nVirtualBikers, this.nBikers),
-      scoreSum: 0,
-      scoreList: [],
-      scoreSumList: []
-    };
-    for (let i = 0; i < this.races.length; i++) {
-      let scores = this.getBikersScore(this.races[i], race.bikers);
-      race.scoreSum += Race.getArraySum(scores);
-      race.scoreList.push(scores);
-      race.scoreSumList.push(race.scoreSum);
-    }
-    this.computed.push({type: 'no-switching', result: race});
-    return race;
-  }
-
   randomSwitching() {
     const race = {
       bikers: [Race.randomNumbers(this.nVirtualBikers, this.nBikers)],
@@ -48,6 +31,7 @@ class Race {
       let scores = this.getBikersScore(this.races[i], race.bikers[i]);
       let nSwitches = Race.random(this.nSwitches);
       let oldBikers = race.bikers[i].slice();
+      // try some random neighbors of newBikes -> if better switch
       let newBikers = Race.randomNumbers(nSwitches, this.nBikers, race.bikers[i]);
       race.bikers.push(this.randomBikersMix(oldBikers, newBikers));
       race.scoreSum += Race.getArraySum(scores);

@@ -1,85 +1,35 @@
-const fs = require('fs');
+function getNumbersArray(end) {
+    let array = [];
+    for (let i = 0; i < end; i++)
+        array.push(i)
+    return array;
+}
 
-function parseData(fileData) {
-  let orderedRaces = [];
-  let rawRaces = fileData.split('\n\n');
-  for (let i = 1; i < rawRaces.length; i++) {
-    let rawRace = rawRaces[i].split('\n');
-    let orderedRace = { stats: {}, points: [], orderedRaces: []};
-    for (let j = 0; j < rawRace.length; j++) {
-      let orderedRow = rawRace[j].split(' ').map(value => Number.parseInt(value));
-      if (j === 0)
-        orderedRace.stats = {
-            T: orderedRow[0],
-            n: orderedRow[1],
-            d: orderedRow[2],
-            k: orderedRow[3],
-            m: orderedRow[4]
-        };
-      else if (j === 1) orderedRace.points = orderedRow;
-      else orderedRace.orderedRaces.push(orderedRow);
-      }
-      orderedRaces.push(orderedRace);
+function mergeWithoutDuplication(target, input) {
+    let finalArray = target;
+    for (let i = 0; i < input.length; i++)
+      if (!target.includes(input[i])) finalArray.push(input[i]);
+    return finalArray;
+}
+
+function randomNumbers(number, max, except = []) {
+    let numbers = [];
+    if (number >= max) return new Error("Cant generate distinct numbers");
+    for (let i = 0; i < number; i ++) {
+      	let randNumber = Math.floor(Math.random() * max);
+        while (numbers.includes(randNumber) || except.includes(randNumber))
+          	randNumber = Math.floor(Math.random() * max);
+        numbers.push(randNumber);
     }
-    return orderedRaces;
+    return numbers;
 }
 
-function stringifyData(raceId, arrayOfRaces) {
-    let parsedString = '' + raceId + '\n';
-    for (let i = 0; i < arrayOfRaces.length; i++) {
-        for (let j = 0; j < arrayOfRaces[i].length; j++) {
-            parsedString += arrayOfRaces[i][j];
-            parsedString += ' ';
-        }
-        parsedString += "\n";
-    }
-    return parsedString;
+function random(max) {
+    return Math.floor(Math.random() * (max+1));
 }
 
-function saveJsonData(object, filename) {
-  return new Promise(resolve => {
-      fs.writeFile('../inputs/' +filename, JSON.stringify(object, null, 2), 'utf8',
-          (err, success) => {
-            if (err) return resolve(err);
-            else return resolve(success);
-      });
-  })
+function getArraySum(array) {
+    let sum = 0;
+    for (let i = 0; i < array.length; i++) sum += array[i];
+    return sum;
 }
-
-function saveData(object, filename) {
-    return new Promise(resolve => {
-        fs.writeFile('../results/' + filename + '.txt', object, 'utf8',
-            (err, success) => {
-                if (err) return resolve(err);
-                else return resolve(success);
-            });
-    })
-}
-
-function getFileData(filename) {
-  return new Promise((resolve => {
-    const fileStream = fs.createReadStream('../inputs/' +filename);
-    let fileData = '';
-    fileStream.on('data', data => fileData += data);
-    fileStream.on('error', err => err);
-    fileStream.on('end', () => resolve(fileData))
-  }));
-}
-
-function getJsonFileData(filename) {
-    return new Promise((resolve => {
-        const fileStream = fs.createReadStream('../inputs/' + filename + '.json');
-        let fileData = '';
-        fileStream.on('data', data => fileData += data);
-        fileStream.on('error', err => console.error(err));
-        fileStream.on('end', () => resolve(JSON.parse(fileData)))
-    }));
-}
-
-module.exports = {
-    parseData: parseData,
-    saveData: saveData,
-    getFileData: getFileData,
-    stringifyData: stringifyData,
-    getJsonFileData: getJsonFileData
-};

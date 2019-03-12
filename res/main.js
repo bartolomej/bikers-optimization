@@ -1,6 +1,9 @@
 const plotly = require('plotly')("kozorog", "SzLQweRMdm9Yb3rRhvdi");
+const data = require('./data');
 const utils = require('./utils');
 const Race = require('./Race').Race;
+
+// results: http://rtk.ijs.si/2019/kolesarji/#naj
 
 (async function init() {
     let raceId = Number.parseInt(process.argv[2]);
@@ -14,7 +17,7 @@ const Race = require('./Race').Race;
 })();
 
 async function computeRace(raceId, algorithm, repeat) {
-    let data = await utils.getJsonFileData('test');
+    let data = await data.getJsonFileData('test');
     let r = data[raceId-1];
     let race = new Race(raceId, r.stats.n, r.stats.k, r.stats.d, r.stats.m, r.points, r.orderedRaces);
     let attempts = [];
@@ -23,7 +26,7 @@ async function computeRace(raceId, algorithm, repeat) {
     let bestAttempt = {scoreSum: 0};
     for (let i = 0; i < repeat; i++)
         if (attempts[i].scoreSum > bestAttempt.scoreSum)  bestAttempt = attempts[i];
-    plot(getNumbersArray(bestAttempt.scoreSumList.length), bestAttempt.scoreSumList);
+    plot(utils.getNumbersArray(bestAttempt.scoreSumList.length), bestAttempt.scoreSumList);
     await onFinish(race.id, bestAttempt.scoreSum, bestAttempt.bikers);
     log(race, attempts, bestAttempt);
 }
@@ -34,16 +37,9 @@ function log(race, attempts, bestAttempt) {
 }
 
 async function onFinish(raceId, score, race) {
-    let parsedData = utils.stringifyData(raceId, race);
+    let parsedData = data.stringifyData(raceId, race);
     let filename =  'race_' + raceId + '_' + score + '_' + new Date().getUTCMilliseconds();
-    await utils.saveData(parsedData, filename);
-}
-
-function getNumbersArray(end) {
-    let array = [];
-    for (let i = 0; i < end; i++)
-        array.push(i)
-    return array;
+    await data.saveData(parsedData, filename);
 }
 
 function plot(xAxis, yAxis) {
