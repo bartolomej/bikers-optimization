@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const directory = '../results/';
+const directory = '../../results/';
 
 (function() {
     clean();
