@@ -39,5 +39,5 @@ module.exports = {
     mergeWithoutDuplication: mergeWithoutDuplication,
     randomDistinctNumbers: randomDistinctNumbers,
     getArraySum: getArraySum,
-    random: random
+    random: random,
 };

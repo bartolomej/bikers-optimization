@@ -17,6 +17,16 @@ class Race {
 		return scoreSum;
 	}
 
+	getScorePlotData() {
+		let score = [];
+		for (let i = 0; i < this.scoreTrack.length; i++) {
+			let scoreSum = 0;
+			for (let j = 0; j < this.scoreTrack[i].length; j++)
+				scoreSum += this.scoreTrack[i][j];
+		}
+		return score;
+	}
+
 	getScoreTrack() {
 		return this.scoreTrack;
 	}

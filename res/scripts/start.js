@@ -10,7 +10,7 @@ const main = require('../main');
 
     if (process.argv[4] === undefined) gradientSteps = 1;
     if (process.argv[5] === undefined) repeat = 1;
-    if (algorithm === 'no-switching' || algorithm === 'random-switching'
+    if (algorithm === 'iterative-switching' || algorithm === 'random-switching'
         && raceId > 0 && raceId < 29)  {
         if (!Number.isNaN(interval)) setInterval(async () => await compute(), interval);
         else await compute();

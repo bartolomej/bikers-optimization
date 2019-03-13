@@ -67,10 +67,16 @@ describe('Optimization class testing', function () {
         should.not.equal(arrayMix, [1,2,3]);
         should.equal(falseArrayMix.length, 4);
     });
-    it('should compute race with gradient descent', function () {
+    it('should compute race with random gradient descent', function () {
         let races = [[5,3,4,2,1], [3,4,5,1,2], [1,2,5,3,4], [4,2,1,5,3]];
-        let instance = new Optimization(1, 5, 3, 4, 2, [100, 80, 60, 40], races);
+        let instance = new Optimization(1, 5, 3, 4, 2, [100, 80, 60], races);
         let randomSwitchResult = instance.randomSwitching(10, true);
+        should.exist(randomSwitchResult);
+    });
+    it('should should compute race with iterative gradient descent', function () {
+        let races = [[5,3,4,2,1], [3,4,5,1,2], [1,2,5,3,4], [4,2,1,5,3]];
+        let instance = new Optimization(1, 5, 3, 4, 2, [100, 80, 60], races);
+        let randomSwitchResult = instance.iterativeSwitching(1);
         should.exist(randomSwitchResult);
     });
     it('should compute race', function () {

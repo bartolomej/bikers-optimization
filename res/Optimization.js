@@ -22,8 +22,10 @@ class Optimization {
 
   randomSwitching(gradientSteps = 1, useMaxSwitches = false) {
     let race = new Race(this.nRaces, this.nVirtualBikers);
-    race.addNewBikers(utils.randomDistinctNumbers(this.nVirtualBikers, this.nBikers));
-    for (let i = 0; i < this.nRaces-1; i++) {
+    let initialBikers = utils.randomDistinctNumbers(this.nVirtualBikers, this.nBikers);
+    race.addNewBikers(initialBikers);
+    race.addScoreTrack(this.getBikersScore(initialBikers, this.races[0]));
+    for (let i = 1; i < this.nRaces; i++) {
       let cache = {};
       for (let j = 0; j < gradientSteps; j++) {
         let nSwitches = utils.random(this.nSwitches);
@@ -34,9 +36,35 @@ class Optimization {
         let scoreTrack = this.getBikersScore(mergedBikers, this.races[i]);
         let scoreSum = utils.getArraySum(scoreTrack);
         if (cache.score === undefined || scoreSum > cache.score) {
-            cache.score = scoreSum;
-            cache.bikers = mergedBikers;
-            cache.scoreTrack = scoreTrack;
+          cache.score = scoreSum;
+          cache.bikers = mergedBikers;
+          cache.scoreTrack = scoreTrack;
+        }
+      }
+      race.addNewBikers(cache.bikers);
+      race.addScoreTrack(cache.scoreTrack);
+    }
+    return race;
+  }
+
+  iterativeSwitching(gradientSteps = 1) {
+    let race = new Race(this.nRaces, this.nVirtualBikers);
+    let initialBikers = [];
+    for (let i = 0; i < this.nVirtualBikers; i++)
+      initialBikers.push(this.races[0][i]);
+    race.addNewBikers(initialBikers);
+    race.addScoreTrack(this.getBikersScore(initialBikers, this.races[0]));
+    for (let i = 1; i < this.nRaces; i++) {
+      let cache = {};
+      for (let j = 0; j < gradientSteps; j++) {
+        let oldBikers = race.getNewestBikers();
+        let newBikers = this.iterativeBikersMix(oldBikers, this.races[i]);
+        let scoreTrack = this.getBikersScore(newBikers, this.races[i]);
+        let scoreSum = utils.getArraySum(scoreTrack);
+        if (cache.score === undefined || scoreSum > cache.score) {
+          cache.score = scoreSum;
+          cache.bikers = newBikers;
+          cache.scoreTrack = scoreTrack;
         }
       }
       race.addNewBikers(cache.bikers);
@@ -57,18 +85,39 @@ class Optimization {
     return mixedBikers;
   }
 
-    getBikersScore(bikers, race) {
-      let scores = [];
-      for (let i = 0; i < bikers.length; i++) {
-        for (let j = 0; j < race.length; j++) {
-          if (race[j] === bikers[i]) {
-            if (this.points[j] === undefined) scores.push(0);
-            else scores.push(this.points[j]);
-          }
+  iterativeBikersMix(oldBikers, race) {
+    let mixedBikersMix = oldBikers.slice();
+    let switchCount = 0;
+    for (let i = 0; i < race.length; i++) {
+      if (switchCount >= this.nSwitches) break;
+      if (!oldBikers.includes(race[i])) {
+        mixedBikersMix.push(race[i]);
+        switchCount++;
+      }
+    } 
+    for (let i = race.length; i > 0; i--) {
+      if (switchCount <= 0) break;
+      let index = mixedBikersMix.indexOf(race[i]);
+      if (index > -1) {
+        mixedBikersMix.splice(index, 1);
+        switchCount--;
+      }
+    }
+    return mixedBikersMix;
+  }
+
+  getBikersScore(bikers, race) {
+    let scores = [];
+    for (let i = 0; i < bikers.length; i++) {
+      for (let j = 0; j < race.length; j++) {
+        if (race[j] === bikers[i]) {
+          if (this.points[j] === undefined) scores.push(0);
+          else scores.push(this.points[j]);
         }
       }
-      return scores;
     }
+    return scores;
+  }
 
 }
 

@@ -2,6 +2,7 @@ const plotly = require('plotly')("kozorog", "SzLQweRMdm9Yb3rRhvdi");
 const data = require('./data');
 const utils = require('./utils');
 const Optimization = require('./Optimization').Optimization;
+const Race = require('./Race').Race;
 
 // results: http://rtk.ijs.si/2019/kolesarji/#naj
 
@@ -15,15 +16,17 @@ async function computeRace(raceId, algorithm, gradientSteps = 1, repeat = 1, use
             input.stats.m, input.points,
             input.orderedRaces);
         let attempts = [];
-        let bestAttempt = 0;
+        let bestAttempt = new Race();
         for (let i = 0; i < repeat; i++)
-            attempts.push(instance.randomSwitching(gradientSteps, useMaxSwitches));
-        console.log(attempts);
+            if (algorithm === 'random-switching')
+                attempts.push(instance.randomSwitching(gradientSteps, useMaxSwitches));
+            else if (algorithm === 'iterative-switching')
+                attempts.push(instance.iterativeSwitching(gradientSteps));
         for (let i = 0; i < repeat; i++)
-            if (attempts[i].getTotalScore() > bestAttempt) bestAttempt = attempts[i];
+            if (attempts[i].getTotalScore() > bestAttempt.getTotalScore()) bestAttempt = attempts[i];
         await save(instance.id, bestAttempt.getTotalScore(), bestAttempt.getAllRaces());
-        plot(utils.getNumbersArray(bestAttempt.getScoreTrack().length), bestAttempt.getTotalScore());
-        log(instance, attempts, bestAttempt);
+        plot(utils.getNumbersArray(bestAttempt.getScoreTrack().length), bestAttempt.getScorePlotData());
+        log(instance, attempts, bestAttempt.getScorePlotData());
         return resolve();
     })
 }
