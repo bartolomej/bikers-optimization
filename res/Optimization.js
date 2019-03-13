@@ -1,4 +1,5 @@
 const utils = require('./utils');
+const Race = require('./Race').Race;
 
 /**
  *  T -> test case number
@@ -10,65 +11,64 @@ const utils = require('./utils');
 class Optimization {
 
   constructor(id, nBikers, nVirtualBikers, nRaces, nSwitches, points, races) {
-    this.id = id; // T
-    this.nBikers = nBikers; // n
-    this.nRaces = nRaces; // d
-    this.nVirtualBikers = nVirtualBikers; // k
-    this.nSwitches = nSwitches; // m
+    this.id = id;
+    this.nBikers = nBikers;
+    this.nRaces = nRaces;
+    this.nVirtualBikers = nVirtualBikers;
+    this.nSwitches = nSwitches;
     this.points = points;
     this.races = races;
-    this.computed = [];
   }
 
-  randomSwitching() {
-    const race = {
-      bikers: [utils.randomNumbers(this.nVirtualBikers, this.nBikers)],
-      scoreSum: 0,
-      scoreList: [],
-      scoreSumList: []
-    };
-    for (let i = 0; i < this.races.length; i++) {
-      let scores = this.getBikersScore(this.races[i], race.bikers[i]);
-      let nSwitches = utils.random(this.nSwitches);
-      let oldBikers = race.bikers[i].slice();
-      // try some random neighbors of newBikes -> if better switch
-      let newBikers = utils.randomNumbers(nSwitches, this.nBikers, race.bikers[i]);
-      // set class methods in Race
-      race.bikers.push(this.randomBikersMix(oldBikers, newBikers));
-      race.scoreSum += utils.getArraySum(scores);
-      race.scoreList.push(scores);
-      race.scoreSumList.push(race.scoreSum);
+  randomSwitching(gradientSteps = 1, useMaxSwitches = false) {
+    let race = new Race(this.nRaces, this.nVirtualBikers);
+    race.addNewBikers(utils.randomDistinctNumbers(this.nVirtualBikers, this.nBikers));
+    for (let i = 0; i < this.nRaces-1; i++) {
+      let cache = {};
+      for (let j = 0; j < gradientSteps; j++) {
+        let nSwitches = utils.random(this.nSwitches);
+        if (useMaxSwitches) nSwitches = this.nSwitches;
+        let oldBikers = race.getNewestBikers();
+        let newBikers = utils.randomDistinctNumbers(nSwitches, this.nBikers, oldBikers);
+        let mergedBikers = this.randomBikersMix(oldBikers, newBikers);
+        let scoreTrack = this.getBikersScore(mergedBikers, this.races[i]);
+        let scoreSum = utils.getArraySum(scoreTrack);
+        if (cache.score === undefined || scoreSum > cache.score) {
+            cache.score = scoreSum;
+            cache.bikers = mergedBikers;
+            cache.scoreTrack = scoreTrack;
+        }
+      }
+      race.addNewBikers(cache.bikers);
+      race.addScoreTrack(cache.scoreTrack);
     }
-    this.computed.push({type: 'random-switching', result: race});
     return race;
   }
 
   randomBikersMix(oldBikers, newBikers) {
-    if (newBikers.length === 0) return oldBikers;
-    if (newBikers.length > this.nSwitches)
-      return new Error('More switched bikers than allowed');
-    oldBikers.splice(0, newBikers.length);
-    newBikers = utils.mergeWithoutDuplication(oldBikers, newBikers);
-    for (let i = 0; i < oldBikers.length; i++) {
-      let random1 = utils.random(newBikers.length-1);
-      let random2 = utils.random(newBikers.length-1);
-      let eleSwitch = newBikers[random1];
-      newBikers[random1] = newBikers[random2];
-      newBikers[random2] = eleSwitch;
+    let mixedBikers = [];
+    let merge = utils.mergeWithoutDuplication(oldBikers, newBikers);
+    if (merge.length === this.nVirtualBikers) return merge;
+    let elected = utils.randomDistinctNumbers(this.nVirtualBikers, merge.length-1);
+    for (let i = 0; i < elected.length; i++) {
+      let index = elected[i];
+      mixedBikers.push(merge[index]);
     }
-    return oldBikers;
+    return mixedBikers;
   }
 
-  getBikersScore(race, bikers) {
-    let scores = [];
-    for (let i = 0; i < bikers.length; i++) {
-      for (let j = 0; j < race.length; j++) {
-        if (race[j] === bikers[i])
-          scores.push(this.points[j]);
+    getBikersScore(bikers, race) {
+      let scores = [];
+      for (let i = 0; i < bikers.length; i++) {
+        for (let j = 0; j < race.length; j++) {
+          if (race[j] === bikers[i]) {
+            if (this.points[j] === undefined) scores.push(0);
+            else scores.push(this.points[j]);
+          }
         }
       }
-    return scores;
-  }
+      return scores;
+    }
 
 }
 

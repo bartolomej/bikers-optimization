@@ -5,29 +5,23 @@ const Optimization = require('./Optimization').Optimization;
 
 // results: http://rtk.ijs.si/2019/kolesarji/#naj
 
-async function computeRace(raceId, algorithm, repeat) {
-    let data = await data.getJsonFileData('test');
-    let input = data[raceId-1];
+async function computeRace(raceId, algorithm, gradientSteps = 1, repeat = 1, useMaxSwitches = false) {
+    let inputData = await data.getJsonFileData('input_races');
+    let input = inputData[raceId-1];
     let instance = new Optimization(
         raceId, input.stats.n, 
         input.stats.k, input.stats.d, 
         input.stats.m, input.points, 
         input.orderedRaces);
-
     let attempts = [];
     let bestAttempt = 0;
-
     for (let i = 0; i < repeat; i++)
-        attempts.push(instance.randomSwitching());
-    
+        attempts.push(instance.randomSwitching(gradientSteps, useMaxSwitches));
+    console.log(attempts);
     for (let i = 0; i < repeat; i++)
-        if (attempts[i].getTotalScore() > bestAttempt)  
-            bestAttempt = attempts[i].getTotalScore();
-
-    await save(instance.id, bestAttempt.getTotalScore(), bestAttempt.getBikers());
-    plot(utils.getNumbersArray(bestAttempt.getScoreTrack().length), 
-        bestAttempt.getScoreTrack());
-    // TODO correct passing bestAttempt -> new object is instance of Race !
+        if (attempts[i].getTotalScore() > bestAttempt) bestAttempt = attempts[i];
+    await save(instance.id, bestAttempt.getTotalScore(), bestAttempt.getAllRaces());
+    plot(utils.getNumbersArray(bestAttempt.getScoreTrack().length), bestAttempt.getTotalScore());
     log(instance, attempts, bestAttempt);
 }
 

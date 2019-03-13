@@ -9,7 +9,7 @@ const directory = '../../results/';
 
 function clean() {
     fs.readdir(directory, (err, files) => {
-        if (err) throw err;
+        if (err) return err;
         let bestResults = [];
         for (const file of files) {
             let search = file.split("_");

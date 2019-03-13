@@ -6,26 +6,26 @@ function getNumbersArray(end) {
 }
 
 function mergeWithoutDuplication(target, input) {
-    let finalArray = target;
+    let finalArray = target.slice();
     for (let i = 0; i < input.length; i++)
       if (!target.includes(input[i])) finalArray.push(input[i]);
     return finalArray;
 }
 
-function randomNumbers(number, max, except = []) {
+function randomDistinctNumbers(numberOf, maxValue, except = []) {
     let numbers = [];
-    if (number >= max) return new Error("Cant generate distinct numbers");
-    for (let i = 0; i < number; i ++) {
-      	let randNumber = Math.floor(Math.random() * max);
+    if (numberOf > maxValue) throw new Error("Cant generate distinct numbers");
+    for (let i = 0; i < numberOf; i ++) {
+      	let randNumber = Math.floor(Math.random() * maxValue + 1);
         while (numbers.includes(randNumber) || except.includes(randNumber))
-          	randNumber = Math.floor(Math.random() * max);
+          	randNumber = Math.floor(Math.random() * maxValue + 1);
         numbers.push(randNumber);
     }
     return numbers;
 }
 
-function random(max) {
-    return Math.floor(Math.random() * (max+1));
+function random(maxValue) {
+    return Math.floor(Math.random() * (maxValue+1));
 }
 
 function getArraySum(array) {
@@ -33,3 +33,11 @@ function getArraySum(array) {
     for (let i = 0; i < array.length; i++) sum += array[i];
     return sum;
 }
+
+module.exports = {
+    getNumbersArray: getNumbersArray,
+    mergeWithoutDuplication: mergeWithoutDuplication,
+    randomDistinctNumbers: randomDistinctNumbers,
+    getArraySum: getArraySum,
+    random: random
+};

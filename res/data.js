@@ -1,4 +1,7 @@
 const fs = require('fs');
+const INPUTS_DIR = __dirname + '/../inputs/';
+const OUTPUTS_DIR = __dirname + '/../results/';
+
 
 function parseData(fileData) {
   let orderedRaces = [];
@@ -38,7 +41,7 @@ function stringifyData(raceId, arrayOfRaces) {
 
 function saveJsonData(object, filename) {
   return new Promise(resolve => {
-      fs.writeFile('../inputs/' +filename, JSON.stringify(object, null, 2), 'utf8',
+      fs.writeFile(INPUTS_DIR + filename, JSON.stringify(object, null, 2), 'utf8',
           (err, success) => {
             if (err) return resolve(err);
             else return resolve(success);
@@ -48,7 +51,7 @@ function saveJsonData(object, filename) {
 
 function saveData(object, filename) {
     return new Promise(resolve => {
-        fs.writeFile('../results/' + filename + '.txt', object, 'utf8',
+        fs.writeFile(OUTPUTS_DIR + filename + '.txt', object, 'utf8',
             (err, success) => {
                 if (err) return resolve(err);
                 else return resolve(success);
@@ -58,7 +61,7 @@ function saveData(object, filename) {
 
 function getFileData(filename) {
   return new Promise((resolve => {
-    const fileStream = fs.createReadStream('../inputs/' +filename);
+    const fileStream = fs.createReadStream(INPUTS_DIR + filename);
     let fileData = '';
     fileStream.on('data', data => fileData += data);
     fileStream.on('error', err => err);
@@ -68,7 +71,7 @@ function getFileData(filename) {
 
 function getJsonFileData(filename) {
     return new Promise((resolve => {
-        const fileStream = fs.createReadStream('../inputs/' + filename + '.json');
+        const fileStream = fs.createReadStream(INPUTS_DIR + filename + '.json');
         let fileData = '';
         fileStream.on('data', data => fileData += data);
         fileStream.on('error', err => console.error(err));
