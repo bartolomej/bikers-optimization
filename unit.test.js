@@ -90,11 +90,26 @@ describe('Optimization class testing', function () {
     });
 });
 
+describe('Race class testing', function () {
+    it('should properly add and sorted bikers', function () {
+        let race = new Race(3, 3);
+        race.addNewRaceRecord([5,2,4], [100, 60, 0], [5,3,4,2,1]);
+        should.equal(equalArrays(race.bikers[0], [5,4,2]), true);
+    });
+});
+
 
 function shouldNotInclude(array, constraints) {
     for (let i = 0; i < array.length; i++)
         for (let j = 0; j < constraints.length; j++)
             if (array[i] === constraints[j]) return false;
+    return true;
+}
+
+function equalArrays(array1, array2) {
+    if (array2.length !== array1.length) return false;
+    for (let i = 0; i < array1.length; i++)
+        if (array1[i] !== array2[i]) return false;
     return true;
 }
 

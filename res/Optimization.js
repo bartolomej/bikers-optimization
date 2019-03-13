@@ -52,8 +52,8 @@ class Optimization {
     let initialBikers = [];
     for (let i = 0; i < this.nVirtualBikers; i++)
       initialBikers.push(this.races[0][i]);
-    race.addNewBikers(initialBikers);
-    race.addScoreTrack(this.getBikersScore(initialBikers, this.races[0]));
+    race.addNewRaceRecord(initialBikers,
+        this.getBikersScore(initialBikers, this.races[0]), this.races[0]);
     for (let i = 1; i < this.nRaces; i++) {
       let cache = {};
       for (let j = 0; j < gradientSteps; j++) {
@@ -67,8 +67,7 @@ class Optimization {
           cache.scoreTrack = scoreTrack;
         }
       }
-      race.addNewBikers(cache.bikers);
-      race.addScoreTrack(cache.scoreTrack);
+      race.addNewRaceRecord(cache.bikers, cache.scoreTrack, this.races[i]);
     }
     return race;
   }

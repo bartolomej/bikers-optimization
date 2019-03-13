@@ -54,6 +54,16 @@ class Race {
 		this.bikers.push(bikers);
 	}
 
+	addNewRaceRecord(vBikers, scores, race) {
+		if (vBikers.length > this.nVirtualBikers)
+			throw new Error("Larger virtual team than allowed");
+		let sortedBikers = [];
+		for (let i = 0; i < race.length; i++)
+			if (vBikers.indexOf(race[i]) > -1) sortedBikers.push(race[i]);
+		this.bikers.push(sortedBikers);
+		this.scoreTrack.push(scores);
+	}
+
 }
 
 module.exports.Race = Race;
