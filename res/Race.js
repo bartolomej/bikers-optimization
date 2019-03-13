@@ -23,6 +23,7 @@ class Race {
 			let scoreSum = 0;
 			for (let j = 0; j < this.scoreTrack[i].length; j++)
 				scoreSum += this.scoreTrack[i][j];
+			score.push(scoreSum);
 		}
 		return score;
 	}
